@@ -1,6 +1,3 @@
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.io.File; // Import the File class
 import java.io.FileNotFoundException; // Import this class to handle errors
@@ -21,7 +18,6 @@ public class backtrack {
         LinkedList<char[][]> problems = getProblems(args[0]);
         LinkedList<char[][]> solutions = new LinkedList<char[][]>();
         int[] nodesVisited = new int[problems.size()];
-        long[] times = new long[problems.size()];
 
         if (args.length == 2)
             heuristic = args[1];
@@ -29,14 +25,11 @@ public class backtrack {
         if(heuristic.equals("H1") || heuristic.equals("H2") || heuristic.equals("H3")){
             for (int i = 0; i < problems.size(); i++) {
                 System.out.println("Solving puzzle #" + (i + 1) + "...");
-                var startTime = Instant.now();
                 solutions.add(backtrackingSearch(problems.get(i)));
-                var endTime = Instant.now();
-                times[i] = Duration.between(startTime, endTime).get(ChronoUnit.NANOS);
                 nodesVisited[i] = nodeCount; // nodeCount is a global to extract the nodes visited from the recursion
 
                 //print the solution
-                printSolution(problems.get(i), solutions.get(i), i, nodesVisited[i], times[i]);
+                printSolution(problems.get(i), solutions.get(i), i, nodesVisited[i]);
             }
         }
         else{
@@ -45,14 +38,7 @@ public class backtrack {
 
     }
 
-    public static void printSolutions(LinkedList<char[][]> problems, LinkedList<char[][]> solutions,
-                                      int[] nodesVisited, long[] times) {
-        for (int i = 0; i < problems.size(); i++) {
-            printSolution(problems.get(i), solutions.get(i),i , nodesVisited[i] , times[i]);
-        }
-    }
-
-    public static void printSolution(char[][] problem, char[][] solution, int i, int nodesVisited, long times){
+    public static void printSolution(char[][] problem, char[][] solution, int i, int nodesVisited){
         System.out.println("------------------- Puzzle " + (i + 1) + " -------------------\n");
         System.out.println("Puzzle:");
         printProblem(problem);
@@ -63,8 +49,6 @@ public class backtrack {
         else
             System.out.println("Unsolvable");
         System.out.println("\nNodes visited:\n" + nodesVisited);
-        System.out.println("\nTimes (nano):\n" + times);
-        System.out.println("\nTimes (milliseconds):\n" + times/1000000);
         System.out.print("\n");
     }
 
@@ -106,13 +90,6 @@ public class backtrack {
             e.printStackTrace();
         }
         return problems;
-    }
-
-    public static void printProblems(LinkedList<char[][]> list) { // print list of 2d arrays
-        for (char[][] c : list) {
-            printProblem(c);
-            System.out.print("\n");
-        }
     }
 
     public static void printProblem(char[][] c) {
@@ -159,9 +136,6 @@ public class backtrack {
                                                                         // applied
         int[] variable = null;
         switch (heuristic) {
-            //case "H0":
-            //    variable = H0(assignment);
-            //    break;
             case "H1":
                 variable = H1(assignment);
                 break;
@@ -173,17 +147,6 @@ public class backtrack {
                 break;
         }
         return variable;
-    }
-
-    public static int[] H0(char[][] assignment) {
-        for (int i = 0; i < assignment.length; i++) {
-            for (int j = 0; j < assignment[i].length; j++) {
-                if (assignment[i][j] == '_') {
-                    return new int[] { i, j };
-                }
-            }
-        }
-        return null;
     }
 
     public static int[] H1(char[][] assignment) { // finds the most constrained variable
