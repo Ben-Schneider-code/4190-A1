@@ -4,11 +4,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.io.File; // Import the File class
 import java.io.FileNotFoundException; // Import this class to handle errors
+import java.util.Random;
 import java.util.Scanner; // Import the Scanner class to read text files
 
 //Note, the following is a matrix implementation of the CSP, this was done for efficiency reasons.
 //It functions as a constraint graph implicitly, as opposed to explicitly.
 public class forward_checking {
+
+    public static Random rand = new Random();
     public static String heuristic = "";
     public static int nodeCount = 0;
 
@@ -191,7 +194,7 @@ public class forward_checking {
     public static int[] H1(char[][] assignment) { // finds the most constrained variable
         LinkedList<int[]> list = getH1List(assignment);
         if (list != null)
-            return list.get(0);
+            return list.get(rand.nextInt(list.size()));
         else
             return null;
     }
@@ -226,7 +229,8 @@ public class forward_checking {
     }
 
     public static int[] H3(char[][] assignment) { // Finds most constrained variable, that constrains the most other variables
-        int[] var = null;
+        int[] selected = null;
+        var selectedList = new LinkedList<int[]>();
 
         LinkedList<int[]> list = getH1List(assignment);
         if (list != null) {
@@ -235,14 +239,23 @@ public class forward_checking {
                 int currDegree = calculateDegree(list.get(i), assignment);
                 if (currDegree > bestDegree) {
                     bestDegree = currDegree;
-                    var = list.get(i);
+                    selectedList = new LinkedList<int[]>(); //empty out old list
+                    selectedList.add(list.get(i));
+                }
+                else if(currDegree == bestDegree){
+                    selectedList.add(list.get(i));
                 }
             }
         }
-        return var;
+
+        if(selectedList.size() > 0)
+            selected = selectedList.get(rand.nextInt(selectedList.size()));
+
+        return selected;
     }
 
     public static int[] H2(char[][] assignment) { //returns the variable with the highest degree
+        var selectedList = new LinkedList<int[]>();
         int[] selected = null;
         int bestValue = Integer.MIN_VALUE;
 
@@ -251,12 +264,19 @@ public class forward_checking {
                 if (assignment[i][j] == '_') {
                     int currValue = calculateDegree(new int[] { i, j }, assignment);
                     if (currValue > bestValue) {
+                        selectedList = new LinkedList<int[]>(); //empty out old list
+                        selectedList.add(new int[] { i, j });
                         bestValue = currValue;
-                        selected = new int[] { i, j };
                     }
+                    else if (currValue == bestValue) //add ties to the list
+                        selectedList.add(new int[] { i, j });
                 }
             }
         }
+
+        if(selectedList.size() > 0)
+            selected = selectedList.get(rand.nextInt(selectedList.size()));
+
         return selected;
     }
 
