@@ -13,6 +13,13 @@ public class forward_checking {
     public static int nodeCount = 0;
 
     public static void main(String args[]) {
+
+        if(args.length != 3){
+            System.out.println("Please run the program with the file and heuristic choice, for example: ");
+            System.out.println("java forward_checking 12W.txt H3");
+            System.exit(1);
+        }
+
         LinkedList<char[][]> problems = getProblems(args[0]);
         LinkedList<char[][]> solutions = new LinkedList<char[][]>();
         int[] nodesVisited = new int[problems.size()];
