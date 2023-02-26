@@ -38,8 +38,6 @@ public class backtrack {
                 //print the solution
                 printSolution(problems.get(i), solutions.get(i), i, nodesVisited[i], times[i]);
             }
-
-            //printSolutions(problems, solutions, nodesVisited, times);
         }
         else{
             System.out.println("Invalid arguements.");
@@ -65,7 +63,8 @@ public class backtrack {
         else
             System.out.println("Unsolvable");
         System.out.println("\nNodes visited:\n" + nodesVisited);
-        System.out.println("\nTimes (nanoseconds):\n" + times);
+        System.out.println("\nTimes (nano):\n" + times);
+        System.out.println("\nTimes (milliseconds):\n" + times/1000000);
         System.out.print("\n");
     }
 
@@ -127,7 +126,7 @@ public class backtrack {
     }
 
     public static char[][] backtrackingSearch(char[][] csp) {
-        nodeCount = 0;
+        nodeCount = 0; //reset node count
         char[][] assignment = copyArray(csp);
         if (recursiveBacktracking(assignment)) {
             formatSolution(assignment);

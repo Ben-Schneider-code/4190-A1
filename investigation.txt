@@ -1,4 +1,6 @@
 Backtracking
+
+Number of search nodes:
 +----+-----+-----+-------+-------+--------+
 |    | 6x6 | 8x8 | 10x10 | 12x12 | 14x14  |
 +----+-----+-----+-------+-------+--------+
@@ -10,6 +12,8 @@ Backtracking
 +----+-----+-----+-------+-------+--------+
 
 Forward Checking
+
+Number of search nodes:
 +----+------+------+-------+-------+-------+
 |    | 6x6  | 8x8  | 10x10 | 12x12 | 14x14 |
 +----+------+------+-------+-------+-------+
@@ -20,3 +24,52 @@ Forward Checking
 | H3 | 21   | 33   | 65.3  | 101   | 141.3 |
 +----+------+------+-------+-------+-------+
 
+Backtracking on different number of walls
+
+Number of nodes visited:
++----+---------+---------+---------+
+|    | 12W.txt | 24W.txt | 48W.txt |
++----+---------+---------+---------+
+| H1 | 311     | 244     | 153     |
++----+---------+---------+---------+
+| H2 | 5519    | 2261    | 301     |
++----+---------+---------+---------+
+| H3 | 318     | 216     | 153     |
++----+---------+---------+---------+
+
+Real time (measured in milliseconds, i.e. 1/1000th of a second):
++----+---------+---------+---------+
+|    | 12W.txt | 24W.txt | 48W.txt |
++----+---------+---------+---------+
+| H1 | 12.6    | 4.6     | 2.6     |
++----+---------+---------+---------+
+| H2 | 67.6    | 28.3    | 4.6     |
++----+---------+---------+---------+
+| H3 | 11.3    | 3.6     | 3       |
++----+---------+---------+---------+
+
+Forward Checking on different number of walls
+
+Number of nodes visited:
++----+---------+---------+---------+
+|    | 12W.txt | 24W.txt | 48W.txt |
++----+---------+---------+---------+
+| H1 | 194     | 130     | 99      |
++----+---------+---------+---------+
+| H2 | 2088.6  | 553.3   | 175.3   |
++----+---------+---------+---------+
+| H3 | 150     | 121     | 99      |
++----+---------+---------+---------+
+
+Real time (measured in milliseconds, i.e. 1/1000th of a second):
++----+---------+---------+---------+
+|    | 12W.txt | 24W.txt | 48W.txt |
++----+---------+---------+---------+
+| H1 | 11      | 3.3     | 2.3     |
++----+---------+---------+---------+
+| H2 | 50      | 5.6     | 3       |
++----+---------+---------+---------+
+| H3 | 10.6    | 3.3     | 2       |
++----+---------+---------+---------+
+
+On average, forward checking performed better in both nodes visited and real time. On average (over the second 12x12 experiment), backtracking visited 2.1 times (210%) more nodes than forward checking and took 1.7 (170%) times as long (real time) as forward checking. Furthermore, it appears that more walls consistently decreased performance in both runtime and nodes visited in the walls experiment (12W.txt, 24W.txt, 48W.txt). This makes sense, as more walls means less variables and more constraints. Which will result in earlier backtracking. It is obvious from our results that H2 has the worst performance of the heuristics. H1 and H3 are similar on small puzzles (with H3 having a slight edge). However, on large puzzles like the 30x30 in lightbulbs.txt, H3 is clearly asymptotically stronger than H1, with H3 being able to solve the 30x30 in approximately .2 seconds. Whereas H1 does not finish the 30x30 puzzle in reasonable time.

@@ -31,6 +31,8 @@ public class forward_checking {
                 solutions.add(backtrackingSearch(problems.get(i)));
                 var endTime = Instant.now();
                 times[i] = Duration.between(startTime, endTime).get(ChronoUnit.NANOS);
+                System.out.println("SECONDS:::: " + Duration.between(startTime, endTime).getSeconds());
+                System.out.println("NANO:::: " + Duration.between(startTime, endTime).getNano());
                 nodesVisited[i] = nodeCount; // nodeCount is a global to extract the nodes visited from the recursion
                 //print the solution
                 printSolution(problems.get(i), solutions.get(i), i, nodesVisited[i], times[i]);
@@ -62,7 +64,8 @@ public class forward_checking {
         else
             System.out.println("Unsolvable");
         System.out.println("\nNodes visited:\n" + nodesVisited);
-        System.out.println("\nTimes (nanoseconds):\n" + times);
+        System.out.println("\nTimes (nano):\n" + times);
+        System.out.println("\nTimes (milliseconds):\n" + times/1000000);
         System.out.print("\n");
     }
 
