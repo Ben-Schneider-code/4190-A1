@@ -14,7 +14,7 @@ public class forward_checking {
 
     public static void main(String args[]) {
 
-        if(args.length != 3){
+        if(args.length != 2){
             System.out.println("Please run the program with the file and heuristic choice, for example: ");
             System.out.println("java forward_checking 12W.txt H3");
             System.exit(1);

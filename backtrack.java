@@ -16,7 +16,8 @@ public class backtrack {
 
     public static void main(String args[]) {
 
-        if(args.length != 3){
+        System.out.println(args);
+        if(args.length != 2){
             System.out.println("Please run the program with the file and heuristic choice, for example: ");
             System.out.println("java backtrack 12W.txt H3");
             System.exit(1);
