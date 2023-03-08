@@ -93,7 +93,7 @@ public class backtrack {
         // with the fewest of these two options remaining (b and n, just b, or just n).
 
         char[][] lightingApplied = copyArray(assignment);
-        //applyLighting(lightingApplied); // forward forward checking
+        applyLighting(lightingApplied); // forward forward checking
 
         LinkedList<int[]> option1 = new LinkedList<int[]>();
         LinkedList<int[]> option2 = new LinkedList<int[]>();
