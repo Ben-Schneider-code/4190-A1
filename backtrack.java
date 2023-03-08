@@ -30,13 +30,14 @@ public class backtrack {
                 solutions.add(backtrackingSearch(problems.get(i)));
                 var endTime = Instant.now();
                 times[i] = Duration.between(startTime, endTime).get(ChronoUnit.NANOS);
+
                 nodesVisited[i] = nodeCount; // nodeCount is a global to extract the nodes visited from the recursion
 
                 //print the solution
+                System.out.println(Duration.between(startTime, endTime).get(ChronoUnit.SECONDS));
+                System.out.println(Duration.between(startTime, endTime).get(ChronoUnit.NANOS));
                 printSolution(problems.get(i), solutions.get(i), i, nodesVisited[i], times[i]);
             }
-
-            //printSolutions(problems, solutions, nodesVisited, times);
         }
         else{
             System.out.println("Invalid arguements.");
@@ -44,84 +45,6 @@ public class backtrack {
 
     }
 
-    public static void printSolutions(LinkedList<char[][]> problems, LinkedList<char[][]> solutions,
-                                      int[] nodesVisited, long[] times) {
-        for (int i = 0; i < problems.size(); i++) {
-            printSolution(problems.get(i), solutions.get(i),i , nodesVisited[i] , times[i]);
-        }
-    }
-
-    public static void printSolution(char[][] problem, char[][] solution, int i, int nodesVisited, long times){
-        System.out.println("------------------- Puzzle " + (i + 1) + " -------------------\n");
-        System.out.println("Puzzle:");
-        printProblem(problem);
-        System.out.print("\n");
-        System.out.println("Solution:");
-        if (solution != null)
-            printProblem(solution);
-        else
-            System.out.println("Unsolvable");
-        System.out.println("\nNodes visited:\n" + nodesVisited);
-        System.out.println("\nTimes (nanoseconds):\n" + times);
-        System.out.print("\n");
-    }
-
-    public static LinkedList<char[][]> getProblems(String fileName) { // read problems into a list of 2d arrays. Each
-                                                                      // problem must be separated by atleast one #.
-                                                                      // LightupPuzzles.txt works, and so does
-                                                                      // samples.txt
-        LinkedList<char[][]> problems = new LinkedList<char[][]>();
-        Boolean readingProblem = false;
-        Boolean readingDimensions = false;
-        int rowIndex = 0;
-
-        try {
-            File myObj = new File(fileName);
-            Scanner myReader = new Scanner(myObj);
-            while (myReader.hasNextLine()) {
-                String data = myReader.nextLine();
-                if (data.isEmpty() || data.charAt(0) == '#')
-                    readingProblem = false;
-                else if (!readingProblem)
-                    readingDimensions = true;
-                if (readingProblem) {
-                    problems.getLast()[rowIndex] = data.toCharArray();
-                    rowIndex++;
-                }
-                if (readingDimensions) {
-                    rowIndex = 0;
-                    String[] dimensions = data.split(" ");
-                    int numRows = Integer.parseInt(dimensions[0]);
-                    int numCols = Integer.parseInt(dimensions[1]);
-                    problems.add(new char[numRows][numCols]);
-                    readingDimensions = false;
-                    readingProblem = true;
-                }
-            }
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-        return problems;
-    }
-
-    public static void printProblems(LinkedList<char[][]> list) { // print list of 2d arrays
-        for (char[][] c : list) {
-            printProblem(c);
-            System.out.print("\n");
-        }
-    }
-
-    public static void printProblem(char[][] c) {
-        System.out.println(c.length + " x " + c[0].length);
-        for (int i = 0; i < c.length; i++) {
-            for (int j = 0; j < c[i].length; j++) {
-                System.out.print(c[i][j]);
-            }
-            System.out.print("\n");
-        }
-    }
 
     public static char[][] backtrackingSearch(char[][] csp) {
         nodeCount = 0;
@@ -154,34 +77,7 @@ public class backtrack {
     }
 
     public static int[] selectUnassignedVariable(char[][] assignment) { // This is where heuristic functions will be
-                                                                        // applied
-        int[] variable = null;
-        switch (heuristic) {
-            //case "H0":
-            //    variable = H0(assignment);
-            //    break;
-            case "H1":
-                variable = H1(assignment);
-                break;
-            case "H2":
-                variable = H2(assignment);
-                break;
-            case "H3":
-                variable = H3(assignment);
-                break;
-        }
-        return variable;
-    }
-
-    public static int[] H0(char[][] assignment) {
-        for (int i = 0; i < assignment.length; i++) {
-            for (int j = 0; j < assignment[i].length; j++) {
-                if (assignment[i][j] == '_') {
-                    return new int[] { i, j };
-                }
-            }
-        }
-        return null;
+        return H1(assignment);
     }
 
     public static int[] H1(char[][] assignment) { // finds the most constrained variable
@@ -195,9 +91,10 @@ public class backtrack {
     public static LinkedList<int[]> getH1List(char[][] assignment) { // most constrained variable
         // Variables can only be assigned one of 'b' or 'n'. So we choose the variable
         // with the fewest of these two options remaining (b and n, just b, or just n).
-        char[][] lightingApplied = copyArray(assignment);
 
-        applyLighting(lightingApplied);
+        char[][] lightingApplied = copyArray(assignment);
+        //applyLighting(lightingApplied); // forward forward checking
+
         LinkedList<int[]> option1 = new LinkedList<int[]>();
         LinkedList<int[]> option2 = new LinkedList<int[]>();
         for (int i = 0; i < assignment.length; i++) {
@@ -219,109 +116,6 @@ public class backtrack {
             return option2;
         else
             return null;
-    }
-
-    public static int[] H3(char[][] assignment) { // Finds most constrained variable, that constrains the most other variables
-        int[] var = null;
-
-        LinkedList<int[]> list = getH1List(assignment);
-        if (list != null) {
-            int bestDegree = Integer.MIN_VALUE;
-            for (int i = 0; i < list.size(); i++) {
-                int currDegree = calculateDegree(list.get(i), assignment);
-                if (currDegree > bestDegree) {
-                    bestDegree = currDegree;
-                    var = list.get(i);
-                }
-            }
-        }
-        return var;
-    }
-
-    public static int[] H2(char[][] assignment) { //returns the variable with the highest degree
-        int[] selected = null;
-        int bestValue = Integer.MIN_VALUE;
-
-        for (int i = 0; i < assignment.length; i++) {
-            for (int j = 0; j < assignment[i].length; j++) {
-                if (assignment[i][j] == '_') {
-                    int currValue = calculateDegree(new int[] { i, j }, assignment);
-                    if (currValue > bestValue) {
-                        bestValue = currValue;
-                        selected = new int[] { i, j };
-                    }
-                }
-            }
-        }
-        return selected;
-    }
-
-    public static int calculateDegree(int[] var, char[][] assignment) {
-        int currDegree = 0;
-        int i = var[0];
-        int j = var[1];
-
-        //add up unassigned variables from surrounding walls (they share a wall constraint)
-        if (i - 1 >= 0 && isAWall(assignment[i - 1][j])) {
-            currDegree+=calcUnassignedSpacesAroundWall(new int[]{i - 1, j}, assignment);
-        }
-        if (i + 1 < assignment.length && isAWall(assignment[i + 1][j])) {
-            currDegree+=calcUnassignedSpacesAroundWall(new int[]{i + 1, j}, assignment);
-        }
-        if (j - 1 >= 0 && isAWall(assignment[i][j - 1])) {
-            currDegree+=calcUnassignedSpacesAroundWall(new int[]{i, j - 1}, assignment);
-        }
-        if (j + 1 < assignment[0].length && isAWall(assignment[i][j + 1])) {
-            currDegree+=calcUnassignedSpacesAroundWall(new int[]{i, j + 1}, assignment);
-        }
-        
-        //add up unassigned variables from surrounding column and row (they share column/row constraint)
-        // check top
-        for (int posI = i - 1; posI >= 0; posI--)
-            if (assignment[posI][j] == '_')
-                currDegree++;
-             else if (isAWall(assignment[posI][j]))
-                break;
-
-        // check bottom
-        for (int posI = i + 1; posI < assignment.length; posI++)
-            if (assignment[posI][j] == '_')
-                currDegree++;
-             else if (isAWall(assignment[posI][j]))
-                break;
-
-        // check left
-        for (int posJ = j - 1; posJ >= 0; posJ--)
-            if (assignment[i][posJ] == '_')
-                currDegree++;
-             else if (isAWall(assignment[i][posJ]))
-                break;
-
-        // check right
-        for (int posJ = j + 1; posJ < assignment[0].length; posJ++)
-            if (assignment[i][posJ] == '_')
-                currDegree++;
-             else if (isAWall(assignment[i][posJ]))
-                break;
-        return currDegree;
-    }
-
-    public static int calcUnassignedSpacesAroundWall(int[] pos, char[][] assignment){
-        int unassignedCount = 0;
-        if(pos[0] - 1 >= 0)
-            if(assignment[pos[0] - 1][pos[1]] == '_')
-                unassignedCount++;
-        if(pos[0] + 1 < assignment.length)
-            if(assignment[pos[0] + 1][pos[1]] == '_')
-                unassignedCount++;
-        if(pos[1] - 1 >= 0)
-            if(assignment[pos[0]][pos[1] - 1] == '_')
-                unassignedCount++;
-        if(pos[1] + 1 < assignment[pos[0]].length)
-            if(assignment[pos[0]][pos[1] + 1] == '_')
-                unassignedCount++;
-        unassignedCount--;
-        return unassignedCount;
     }
 
     public static int calculateOptions(int[] var, char[][] lightingApplied) { // returns the number of possible
@@ -568,4 +362,74 @@ public class backtrack {
                 current[i][j] = old[i][j];
         return current;
     }
+
+/*
+* I/O GARBAGE IS HERE
+* */
+
+    public static void printSolution(char[][] problem, char[][] solution, int i, int nodesVisited, long times){
+        System.out.println("------------------- Puzzle " + (i + 1) + " -------------------\n");
+        System.out.println("Puzzle:");
+        printProblem(problem);
+        System.out.print("\n");
+        System.out.println("Solution:");
+        if (solution != null)
+            printProblem(solution);
+        else
+            System.out.println("Unsolvable");
+        System.out.println("\nNodes visited:\n" + nodesVisited);
+        System.out.println("\nTimes (nanoseconds):\n" + times);
+        System.out.print("\n");
+    }
+
+    public static LinkedList<char[][]> getProblems(String fileName) { // read problems into a list of 2d arrays. Each
+        // problem must be separated by atleast one #.
+        // LightupPuzzles.txt works, and so does
+        // samples.txt
+        LinkedList<char[][]> problems = new LinkedList<char[][]>();
+        Boolean readingProblem = false;
+        Boolean readingDimensions = false;
+        int rowIndex = 0;
+
+        try {
+            File myObj = new File(fileName);
+            Scanner myReader = new Scanner(myObj);
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                if (data.isEmpty() || data.charAt(0) == '#')
+                    readingProblem = false;
+                else if (!readingProblem)
+                    readingDimensions = true;
+                if (readingProblem) {
+                    problems.getLast()[rowIndex] = data.toCharArray();
+                    rowIndex++;
+                }
+                if (readingDimensions) {
+                    rowIndex = 0;
+                    String[] dimensions = data.split(" ");
+                    int numRows = Integer.parseInt(dimensions[0]);
+                    int numCols = Integer.parseInt(dimensions[1]);
+                    problems.add(new char[numRows][numCols]);
+                    readingDimensions = false;
+                    readingProblem = true;
+                }
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+        return problems;
+    }
+
+    public static void printProblem(char[][] c) {
+        System.out.println(c.length + " x " + c[0].length);
+        for (int i = 0; i < c.length; i++) {
+            for (int j = 0; j < c[i].length; j++) {
+                System.out.print(c[i][j]);
+            }
+            System.out.print("\n");
+        }
+    }
 }
+
